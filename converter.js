@@ -59,17 +59,18 @@ function timeToText(value) {
 function durationToMinutes(value) {
   if (value === null || value === undefined || value === "") return null;
 
-  // O Excel pode entregar durações como objeto Date.
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return (value.getUTCHours() * 60) + value.getUTCMinutes();
-  }
-
-  // Valor numérico do Excel: fração de um dia.
+  // Durações do Excel devem chegar como fração de um dia.
   if (typeof value === "number" && Number.isFinite(value)) {
     return Math.round(value * 24 * 60);
   }
 
-  // Textos como 00:18, 01:42 ou 1:42:00.
+  // Segurança extra caso alguma biblioteca ainda entregue um Date:
+  // usa o horário local, evitando o deslocamento histórico de fuso de 1899.
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return (value.getHours() * 60) + value.getMinutes();
+  }
+
+  // Aceita textos como 00:18, 01:42 ou 1:42:00.
   const text = String(value).trim();
   const match = text.match(/^(\d+):(\d{2})(?::(\d{2}))?$/);
   if (!match) return null;
@@ -90,7 +91,7 @@ function pick(row, possibleNames) {
 
 async function convertFile(file) {
   const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { cellDates: true });
+  const workbook = XLSX.read(arrayBuffer, { cellDates: false });
 
   const sheetName = workbook.SheetNames.find(name =>
     name.trim().toLowerCase() === "base consolidada"
