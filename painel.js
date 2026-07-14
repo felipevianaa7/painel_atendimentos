@@ -10,6 +10,16 @@ const resultsBody = document.getElementById("resultsBody");
 
 let allData = [];
 
+
+function consideredMinutes(item) {
+  if (Number.isFinite(item.tempoConsideradoMinutos)) {
+    return item.tempoConsideradoMinutos;
+  }
+  return Number.isFinite(item.tempoRealMinutos)
+    ? item.tempoRealMinutos
+    : item.tempoSistemaMinutos;
+}
+
 function minutesText(minutes) {
   if (minutes === null || minutes === undefined || Number.isNaN(minutes)) return "—";
   const hours = Math.floor(minutes / 60);
@@ -54,7 +64,7 @@ function filteredData() {
 
 function render() {
   const data = filteredData();
-  const durations = data.map(item => item.tempoSistemaMinutos).filter(Number.isFinite);
+  const durations = data.map(consideredMinutes).filter(Number.isFinite);
   const average = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : null;
   const starts = data.map(item => item.inicio).filter(Boolean).sort();
   const ends = data.map(item => item.termino).filter(Boolean).sort();
@@ -79,7 +89,7 @@ function render() {
       <td>${item.paciente}</td>
       <td>${item.inicio}</td>
       <td>${item.termino}</td>
-      <td>${minutesText(item.tempoSistemaMinutos)}</td>
+      <td>${minutesText(consideredMinutes(item))}</td>
       <td><span class="badge ${item.sobreposicao ? "yes" : "no"}">${item.sobreposicao ? "Sim" : "Não"}</span></td>
     </tr>
   `).join("");

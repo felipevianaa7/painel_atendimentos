@@ -112,6 +112,7 @@ async function convertFile(file) {
       termino: timeToText(pick(row, ["Término", "Termino"])),
       tempoSistemaMinutos: durationToMinutes(pick(row, ["Tempo pelo sistema", "Tempo de atendimento pelo sistema"])),
       tempoRealMinutos: durationToMinutes(pick(row, ["Tempo real apurado", "Tempo de atendimento real"])),
+      tempoConsideradoMinutos: durationToMinutes(pick(row, ["Tempo considerado"])),
       sobreposicao: String(pick(row, ["Sobreposição", "Sobreposicao"])).toLowerCase() === "sim",
       observacao: String(pick(row, ["Observação", "Observacao"])).trim(),
       intervaloSeguinteMinutos: durationToMinutes(pick(row, ["Intervalo seguinte", "Intervalo até o próximo atendimento"])),
