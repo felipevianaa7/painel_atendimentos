@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Painel de Atendimentos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Painel de Atendimentos</h1>
+    <p>Consulta simples dos atendimentos registrados na base consolidada.</p>
+    <nav>
+      <a href="index.html">Consultar dados</a>
+      <a href="converter.html">Converter Excel</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Filtros</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="dateFilter">Data</label>
+        <input id="dateFilter" type="date">
+      </div>
+      <div class="field">
+        <label for="doctorFilter">Médico</label>
+        <select id="doctorFilter"><option value="">Todos os médicos</option></select>
+      </div>
+      <div class="field">
+        <label for="specialtyFilter">Especialidade</label>
+        <select id="specialtyFilter"><option value="">Todas as especialidades</option></select>
+      </div>
+      <div class="field full actions">
+        <button id="applyButton" class="button">Consultar</button>
+        <button id="clearButton" class="button secondary">Limpar filtros</button>
+        <button id="clearSavedButton" class="button danger">Apagar dados salvos</button>
+        <label class="button secondary" for="jsonFile">Carregar outro JSON</label>
+        <input id="jsonFile" class="hidden" type="file" accept=".json">
+      </div>
+    </div>
+    <div id="status" class="status">Carregando dados...</div>
+    <p id="sourceInfo" class="note"></p>
+  </section>
+
+  <section class="card">
+    <h2>Resultado</h2>
+    <div class="kpis">
+      <div class="kpi"><span>Pacientes atendidos</span><strong id="patientCount">0</strong></div>
+      <div class="kpi"><span>Tempo médio pelo sistema</span><strong id="averageTime">—</strong></div>
+      <div class="kpi"><span>Primeiro atendimento</span><strong id="firstTime">—</strong></div>
+      <div class="kpi"><span>Último término</span><strong id="lastTime">—</strong></div>
+      <div class="kpi"><span>Sobreposições</span><strong id="overlapCount">0</strong></div>
+    </div>
+    <p id="answerText" class="note" style="margin-top:16px"></p>
+  </section>
+
+  <section class="card">
+    <h2>Atendimentos encontrados</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th><th>Médico</th><th>Especialidade</th><th>Paciente</th>
+            <th>Início</th><th>Término</th><th>Tempo sistema</th><th>Sobreposição</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>Os dados exibidos são anonimizados e baseados no relatório do sistema.</footer>
+<script src="painel.js"></script>
+</body>
+</html>
