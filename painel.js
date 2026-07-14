@@ -1,158 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Painel de Atendimentos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Painel de Atendimentos</h1>
+    <p>Consulta simples dos atendimentos registrados na base consolidada.</p>
+    <nav>
+      <a href="index.html">Consultar dados</a>
+      <a href="converter.html">Converter Excel</a>
+    </nav>
+  </div>
+</header>
 
-const dateFilter = document.getElementById("dateFilter");
-const doctorFilter = document.getElementById("doctorFilter");
-const specialtyFilter = document.getElementById("specialtyFilter");
-const jsonFile = document.getElementById("jsonFile");
-const statusBox = document.getElementById("status");
-const sourceInfo = document.getElementById("sourceInfo");
-const clearSavedButton = document.getElementById("clearSavedButton");
-const resultsBody = document.getElementById("resultsBody");
+<main>
+  <section class="card">
+    <h2>Filtros</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="dateFilter">Data</label>
+        <input id="dateFilter" type="date">
+      </div>
+      <div class="field">
+        <label for="doctorFilter">Médico</label>
+        <select id="doctorFilter"><option value="">Todos os médicos</option></select>
+      </div>
+      <div class="field">
+        <label for="specialtyFilter">Especialidade</label>
+        <select id="specialtyFilter"><option value="">Todas as especialidades</option></select>
+      </div>
+      <div class="field full actions">
+        <button id="applyButton" class="button">Consultar</button>
+        <button id="clearButton" class="button secondary">Limpar filtros</button>
+        <button id="clearSavedButton" class="button danger">Apagar dados salvos</button>
+        <label class="button secondary" for="jsonFile">Carregar outro JSON</label>
+        <input id="jsonFile" class="hidden" type="file" accept=".json">
+      </div>
+    </div>
+    <div id="status" class="status">Carregando dados...</div>
+    <p id="sourceInfo" class="note"></p>
+  </section>
 
-let allData = [];
+  <section class="card">
+    <h2>Resultado</h2>
+    <div class="kpis">
+      <div class="kpi"><span>Pacientes atendidos</span><strong id="patientCount">0</strong></div>
+      <div class="kpi"><span>Tempo médio pelo sistema</span><strong id="averageTime">—</strong></div>
+      <div class="kpi"><span>Primeiro atendimento</span><strong id="firstTime">—</strong></div>
+      <div class="kpi"><span>Último término</span><strong id="lastTime">—</strong></div>
+      <div class="kpi"><span>Sobreposições</span><strong id="overlapCount">0</strong></div>
+    </div>
+    <p id="answerText" class="note" style="margin-top:16px"></p>
+  </section>
 
-function minutesText(minutes) {
-  if (minutes === null || minutes === undefined || Number.isNaN(minutes)) return "—";
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return hours ? `${hours}h ${String(mins).padStart(2,"0")}min` : `${mins} min`;
-}
+  <section class="card">
+    <h2>Atendimentos encontrados</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th><th>Médico</th><th>Especialidade</th><th>Paciente</th>
+            <th>Início</th><th>Término</th><th>Tempo sistema</th><th>Sobreposição</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
 
-function formatDateBr(isoDate) {
-  if (!isoDate) return "";
-  const [year, month, day] = isoDate.split("-");
-  return `${day}/${month}/${year}`;
-}
-
-function uniqueSorted(field) {
-  return [...new Set(allData.map(item => item[field]).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, "pt-BR"));
-}
-
-function populateFilters() {
-  const selectedDoctor = doctorFilter.value;
-  const selectedSpecialty = specialtyFilter.value;
-
-  doctorFilter.innerHTML = '<option value="">Todos os médicos</option>' +
-    uniqueSorted("medico").map(value => `<option value="${value}">${value}</option>`).join("");
-  specialtyFilter.innerHTML = '<option value="">Todas as especialidades</option>' +
-    uniqueSorted("especialidade").map(value => `<option value="${value}">${value}</option>`).join("");
-
-  doctorFilter.value = selectedDoctor;
-  specialtyFilter.value = selectedSpecialty;
-
-  const dates = uniqueSorted("data");
-  if (!dateFilter.value && dates.length) dateFilter.value = dates[dates.length - 1];
-}
-
-function filteredData() {
-  return allData.filter(item =>
-    (!dateFilter.value || item.data === dateFilter.value) &&
-    (!doctorFilter.value || item.medico === doctorFilter.value) &&
-    (!specialtyFilter.value || item.especialidade === specialtyFilter.value)
-  );
-}
-
-function render() {
-  const data = filteredData();
-  const durations = data.map(item => item.tempoSistemaMinutos).filter(Number.isFinite);
-  const average = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : null;
-  const starts = data.map(item => item.inicio).filter(Boolean).sort();
-  const ends = data.map(item => item.termino).filter(Boolean).sort();
-  const overlaps = data.filter(item => item.sobreposicao).length;
-
-  document.getElementById("patientCount").textContent = data.length;
-  document.getElementById("averageTime").textContent = minutesText(average);
-  document.getElementById("firstTime").textContent = starts[0] || "—";
-  document.getElementById("lastTime").textContent = ends.at(-1) || "—";
-  document.getElementById("overlapCount").textContent = overlaps;
-
-  const doctorText = doctorFilter.value ? ` pelo médico ${doctorFilter.value}` : "";
-  const dateText = dateFilter.value ? ` em ${formatDateBr(dateFilter.value)}` : "";
-  document.getElementById("answerText").textContent =
-    `Foram encontrados ${data.length} pacientes atendidos${doctorText}${dateText}.`;
-
-  resultsBody.innerHTML = data.map(item => `
-    <tr class="${item.sobreposicao ? "overlap" : ""}">
-      <td>${formatDateBr(item.data)}</td>
-      <td>${item.medico}</td>
-      <td>${item.especialidade}</td>
-      <td>${item.paciente}</td>
-      <td>${item.inicio}</td>
-      <td>${item.termino}</td>
-      <td>${minutesText(item.tempoSistemaMinutos)}</td>
-      <td><span class="badge ${item.sobreposicao ? "yes" : "no"}">${item.sobreposicao ? "Sim" : "Não"}</span></td>
-    </tr>
-  `).join("");
-
-  statusBox.textContent = `${allData.length} registros disponíveis; ${data.length} exibidos.`;
-  statusBox.className = "status";
-}
-
-async function loadDefaultData() {
-  const saved = localStorage.getItem("painelAtendimentosData");
-  const updatedAt = localStorage.getItem("painelAtendimentosUpdatedAt");
-
-  if (saved) {
-    try {
-      allData = JSON.parse(saved);
-      populateFilters();
-      render();
-      const when = updatedAt ? new Date(updatedAt).toLocaleString("pt-BR") : "data desconhecida";
-      sourceInfo.textContent = `Fonte: dados salvos neste navegador em ${when}.`;
-      return;
-    } catch {
-      localStorage.removeItem("painelAtendimentosData");
-      localStorage.removeItem("painelAtendimentosUpdatedAt");
-    }
-  }
-
-  const response = await fetch("dados/atendimentos.json", { cache: "no-store" });
-  if (!response.ok) throw new Error("Não foi possível carregar os dados iniciais.");
-  allData = await response.json();
-  populateFilters();
-  render();
-  sourceInfo.textContent = "Fonte: arquivo padrão publicado com o site.";
-}
-
-document.getElementById("applyButton").addEventListener("click", render);
-document.getElementById("clearButton").addEventListener("click", () => {
-  dateFilter.value = "";
-  doctorFilter.value = "";
-  specialtyFilter.value = "";
-  render();
-});
-doctorFilter.addEventListener("change", render);
-specialtyFilter.addEventListener("change", render);
-dateFilter.addEventListener("change", render);
-
-clearSavedButton.addEventListener("click", () => {
-  localStorage.removeItem("painelAtendimentosData");
-  localStorage.removeItem("painelAtendimentosUpdatedAt");
-  sourceInfo.textContent = "Dados salvos apagados. Recarregando a base padrão...";
-  loadDefaultData().catch(error => {
-    statusBox.textContent = error.message;
-    statusBox.className = "status error";
-  });
-});
-
-jsonFile.addEventListener("change", async () => {
-  const file = jsonFile.files[0];
-  if (!file) return;
-  try {
-    allData = JSON.parse(await file.text());
-    localStorage.setItem("painelAtendimentosData", JSON.stringify(allData));
-    localStorage.setItem("painelAtendimentosUpdatedAt", new Date().toISOString());
-    populateFilters();
-    render();
-    sourceInfo.textContent = "Fonte: JSON carregado e salvo neste navegador.";
-    statusBox.textContent = `JSON carregado: ${allData.length} registros.`;
-  } catch {
-    statusBox.textContent = "O arquivo JSON não pôde ser lido.";
-    statusBox.className = "status error";
-  }
-});
-
-loadDefaultData().catch(error => {
-  statusBox.textContent = `${error.message} Abra o projeto por um servidor local ou publique no Vercel.`;
-  statusBox.className = "status error";
-});
+<footer>Os dados exibidos são anonimizados e baseados no relatório do sistema.</footer>
+<script src="painel.js"></script>
+</body>
+</html>

@@ -1,174 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Conversor Excel para JSON</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Conversor Excel para JSON</h1>
+    <p>Converte a aba “Base Consolidada” em um arquivo pronto para o painel.</p>
+    <nav>
+      <a href="index.html">Consultar dados</a>
+      <a href="converter.html">Converter Excel</a>
+    </nav>
+  </div>
+</header>
 
-const fileInput = document.getElementById("excelFile");
-const dropZone = document.getElementById("dropZone");
-const convertButton = document.getElementById("convertButton");
-const useButton = document.getElementById("useButton");
-const downloadButton = document.getElementById("downloadButton");
-const statusBox = document.getElementById("status");
-const previewCard = document.getElementById("previewCard");
-const previewBody = document.getElementById("previewBody");
+<main>
+  <section class="card">
+    <h2>Selecionar planilha</h2>
+    <div id="dropZone" class="drop-zone">
+      <p><strong>Arraste o Excel aqui</strong> ou selecione o arquivo abaixo.</p>
+      <input id="excelFile" type="file" accept=".xlsx,.xls">
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button id="convertButton" class="button">Converter para JSON</button>
+      <button id="useButton" class="button secondary" disabled>Usar estes dados no painel</button>
+      <button id="downloadButton" class="button secondary" disabled>Baixar atendimentos.json</button>
+    </div>
+    <div id="status" class="status">Nenhum arquivo processado.</div>
+  </section>
 
-let convertedData = null;
+  <section class="card">
+    <h2>O que esta página faz</h2>
+    <p class="note">
+      Ela procura a aba <strong>Base Consolidada</strong>, ignora nomes reais de pacientes
+      porque o arquivo já deve estar anonimizado e converte os horários e durações para um
+      formato simples. O Excel não é enviado para nenhum servidor: a conversão acontece no seu navegador.
+    </p>
+  </section>
 
-["dragenter", "dragover"].forEach(eventName => {
-  dropZone.addEventListener(eventName, event => {
-    event.preventDefault();
-    dropZone.classList.add("dragging");
-  });
-});
-["dragleave", "drop"].forEach(eventName => {
-  dropZone.addEventListener(eventName, event => {
-    event.preventDefault();
-    dropZone.classList.remove("dragging");
-  });
-});
-dropZone.addEventListener("drop", event => {
-  const files = event.dataTransfer.files;
-  if (files.length) fileInput.files = files;
-});
+  <section id="previewCard" class="card hidden">
+    <h2>Prévia</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data</th><th>Médico</th><th>Especialidade</th><th>Paciente</th><th>Início</th><th>Término</th></tr></thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
 
-function excelDateToISO(value) {
-  if (!value) return "";
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return value.toISOString().slice(0, 10);
-  }
-  if (typeof value === "number") {
-    const date = XLSX.SSF.parse_date_code(value);
-    return `${date.y}-${String(date.m).padStart(2,"0")}-${String(date.d).padStart(2,"0")}`;
-  }
-  const text = String(value).trim();
-  const br = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (br) return `${br[3]}-${br[2]}-${br[1]}`;
-  return text.slice(0, 10);
-}
-
-function timeToText(value) {
-  if (value === null || value === undefined || value === "") return "";
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return `${String(value.getHours()).padStart(2,"0")}:${String(value.getMinutes()).padStart(2,"0")}`;
-  }
-  if (typeof value === "number") {
-    const totalMinutes = Math.round((value % 1) * 24 * 60);
-    return `${String(Math.floor(totalMinutes / 60) % 24).padStart(2,"0")}:${String(totalMinutes % 60).padStart(2,"0")}`;
-  }
-  const text = String(value);
-  const match = text.match(/(\d{2}):(\d{2})/);
-  return match ? `${match[1]}:${match[2]}` : text;
-}
-
-function durationToMinutes(value) {
-  if (value === null || value === undefined || value === "") return null;
-  if (typeof value === "number") return Math.round(value * 24 * 60);
-  const text = String(value).trim();
-  const match = text.match(/^(\d+):(\d{2})$/);
-  return match ? Number(match[1]) * 60 + Number(match[2]) : null;
-}
-
-function pick(row, possibleNames) {
-  for (const name of possibleNames) {
-    if (Object.prototype.hasOwnProperty.call(row, name)) return row[name];
-  }
-  return "";
-}
-
-async function convertFile(file) {
-  const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { cellDates: true });
-
-  const sheetName = workbook.SheetNames.find(name =>
-    name.trim().toLowerCase() === "base consolidada"
-  );
-  if (!sheetName) throw new Error('A aba "Base Consolidada" não foi encontrada.');
-
-  const worksheet = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "", range: 1 });
-
-  const result = rows
-    .filter(row => pick(row, ["Data"]) && pick(row, ["Médico", "Medico"]))
-    .map(row => ({
-      data: excelDateToISO(pick(row, ["Data"])),
-      medico: String(pick(row, ["Médico", "Medico"])).trim(),
-      especialidade: String(pick(row, ["Especialidade"])).trim(),
-      paciente: String(pick(row, ["Nome fila", "Paciente"])).trim(),
-      inicio: timeToText(pick(row, ["Início", "Inicio"])),
-      termino: timeToText(pick(row, ["Término", "Termino"])),
-      tempoSistemaMinutos: durationToMinutes(pick(row, ["Tempo pelo sistema", "Tempo de atendimento pelo sistema"])),
-      tempoRealMinutos: durationToMinutes(pick(row, ["Tempo real apurado", "Tempo de atendimento real"])),
-      sobreposicao: String(pick(row, ["Sobreposição", "Sobreposicao"])).toLowerCase() === "sim",
-      observacao: String(pick(row, ["Observação", "Observacao"])).trim(),
-      intervaloSeguinteMinutos: durationToMinutes(pick(row, ["Intervalo seguinte", "Intervalo até o próximo atendimento"])),
-      origem: String(pick(row, ["Origem"])).trim()
-    }));
-
-  if (!result.length) throw new Error("Nenhum atendimento válido foi encontrado.");
-  return result;
-}
-
-function renderPreview(data) {
-  previewBody.innerHTML = data.slice(0, 8).map(item => `
-    <tr>
-      <td>${item.data}</td>
-      <td>${item.medico}</td>
-      <td>${item.especialidade}</td>
-      <td>${item.paciente}</td>
-      <td>${item.inicio}</td>
-      <td>${item.termino}</td>
-    </tr>
-  `).join("");
-  previewCard.classList.remove("hidden");
-}
-
-convertButton.addEventListener("click", async () => {
-  const file = fileInput.files[0];
-  if (!file) {
-    statusBox.textContent = "Selecione um arquivo Excel.";
-    statusBox.className = "status error";
-    return;
-  }
-
-  try {
-    statusBox.textContent = "Processando...";
-    statusBox.className = "status";
-    convertedData = await convertFile(file);
-    renderPreview(convertedData);
-    useButton.disabled = false;
-    downloadButton.disabled = false;
-    statusBox.textContent = `${convertedData.length} atendimentos convertidos com sucesso. Agora você pode usar esses dados no painel.`;
-  } catch (error) {
-    convertedData = null;
-    useButton.disabled = true;
-    downloadButton.disabled = true;
-    previewCard.classList.add("hidden");
-    statusBox.textContent = error.message;
-    statusBox.className = "status error";
-  }
-});
-
-
-useButton.addEventListener("click", () => {
-  if (!convertedData) return;
-
-  try {
-    localStorage.setItem("painelAtendimentosData", JSON.stringify(convertedData));
-    localStorage.setItem("painelAtendimentosUpdatedAt", new Date().toISOString());
-    statusBox.textContent = `${convertedData.length} atendimentos salvos neste navegador. Abrindo o painel...`;
-    statusBox.className = "status";
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 500);
-  } catch (error) {
-    statusBox.textContent = "Não foi possível salvar os dados neste navegador.";
-    statusBox.className = "status error";
-  }
-});
-
-downloadButton.addEventListener("click", () => {
-  if (!convertedData) return;
-  const blob = new Blob([JSON.stringify(convertedData, null, 2)], { type: "application/json;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "atendimentos.json";
-  link.click();
-  URL.revokeObjectURL(url);
-});
+<footer>Painel de Atendimentos</footer>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="converter.js"></script>
+</body>
+</html>
