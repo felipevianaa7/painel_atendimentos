@@ -2,6 +2,7 @@
 const fileInput = document.getElementById("excelFile");
 const dropZone = document.getElementById("dropZone");
 const convertButton = document.getElementById("convertButton");
+const useButton = document.getElementById("useButton");
 const downloadButton = document.getElementById("downloadButton");
 const statusBox = document.getElementById("status");
 const previewCard = document.getElementById("previewCard");
@@ -130,13 +131,33 @@ convertButton.addEventListener("click", async () => {
     statusBox.className = "status";
     convertedData = await convertFile(file);
     renderPreview(convertedData);
+    useButton.disabled = false;
     downloadButton.disabled = false;
-    statusBox.textContent = `${convertedData.length} atendimentos convertidos com sucesso.`;
+    statusBox.textContent = `${convertedData.length} atendimentos convertidos com sucesso. Agora você pode usar esses dados no painel.`;
   } catch (error) {
     convertedData = null;
+    useButton.disabled = true;
     downloadButton.disabled = true;
     previewCard.classList.add("hidden");
     statusBox.textContent = error.message;
+    statusBox.className = "status error";
+  }
+});
+
+
+useButton.addEventListener("click", () => {
+  if (!convertedData) return;
+
+  try {
+    localStorage.setItem("painelAtendimentosData", JSON.stringify(convertedData));
+    localStorage.setItem("painelAtendimentosUpdatedAt", new Date().toISOString());
+    statusBox.textContent = `${convertedData.length} atendimentos salvos neste navegador. Abrindo o painel...`;
+    statusBox.className = "status";
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 500);
+  } catch (error) {
+    statusBox.textContent = "Não foi possível salvar os dados neste navegador.";
     statusBox.className = "status error";
   }
 });

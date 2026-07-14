@@ -29,3 +29,15 @@ Depois abra `http://localhost:8000`.
 
 Suba esta pasta para um repositório no GitHub e importe o repositório no Vercel.
 Como é um site estático, não precisa de banco de dados nem configuração de build.
+
+
+## Novo fluxo pelo Vercel
+
+1. Abra o site publicado no Vercel.
+2. Entre em **Converter Excel**.
+3. Selecione o Excel com a aba **Base Consolidada**.
+4. Clique em **Converter para JSON**.
+5. Clique em **Usar estes dados no painel**.
+6. O navegador salva os dados localmente e abre a página de consulta.
+
+Os dados ficam disponíveis somente naquele navegador e computador. Para usar em outro dispositivo, basta repetir a conversão ou carregar um JSON.

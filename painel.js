@@ -4,6 +4,8 @@ const doctorFilter = document.getElementById("doctorFilter");
 const specialtyFilter = document.getElementById("specialtyFilter");
 const jsonFile = document.getElementById("jsonFile");
 const statusBox = document.getElementById("status");
+const sourceInfo = document.getElementById("sourceInfo");
+const clearSavedButton = document.getElementById("clearSavedButton");
 const resultsBody = document.getElementById("resultsBody");
 
 let allData = [];
@@ -87,11 +89,29 @@ function render() {
 }
 
 async function loadDefaultData() {
+  const saved = localStorage.getItem("painelAtendimentosData");
+  const updatedAt = localStorage.getItem("painelAtendimentosUpdatedAt");
+
+  if (saved) {
+    try {
+      allData = JSON.parse(saved);
+      populateFilters();
+      render();
+      const when = updatedAt ? new Date(updatedAt).toLocaleString("pt-BR") : "data desconhecida";
+      sourceInfo.textContent = `Fonte: dados salvos neste navegador em ${when}.`;
+      return;
+    } catch {
+      localStorage.removeItem("painelAtendimentosData");
+      localStorage.removeItem("painelAtendimentosUpdatedAt");
+    }
+  }
+
   const response = await fetch("dados/atendimentos.json", { cache: "no-store" });
-  if (!response.ok) throw new Error("Não foi possível carregar dados/atendimentos.json.");
+  if (!response.ok) throw new Error("Não foi possível carregar os dados iniciais.");
   allData = await response.json();
   populateFilters();
   render();
+  sourceInfo.textContent = "Fonte: arquivo padrão publicado com o site.";
 }
 
 document.getElementById("applyButton").addEventListener("click", render);
@@ -105,13 +125,26 @@ doctorFilter.addEventListener("change", render);
 specialtyFilter.addEventListener("change", render);
 dateFilter.addEventListener("change", render);
 
+clearSavedButton.addEventListener("click", () => {
+  localStorage.removeItem("painelAtendimentosData");
+  localStorage.removeItem("painelAtendimentosUpdatedAt");
+  sourceInfo.textContent = "Dados salvos apagados. Recarregando a base padrão...";
+  loadDefaultData().catch(error => {
+    statusBox.textContent = error.message;
+    statusBox.className = "status error";
+  });
+});
+
 jsonFile.addEventListener("change", async () => {
   const file = jsonFile.files[0];
   if (!file) return;
   try {
     allData = JSON.parse(await file.text());
+    localStorage.setItem("painelAtendimentosData", JSON.stringify(allData));
+    localStorage.setItem("painelAtendimentosUpdatedAt", new Date().toISOString());
     populateFilters();
     render();
+    sourceInfo.textContent = "Fonte: JSON carregado e salvo neste navegador.";
     statusBox.textContent = `JSON carregado: ${allData.length} registros.`;
   } catch {
     statusBox.textContent = "O arquivo JSON não pôde ser lido.";
