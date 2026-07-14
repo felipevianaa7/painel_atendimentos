@@ -126,13 +126,23 @@ specialtyFilter.addEventListener("change", render);
 dateFilter.addEventListener("change", render);
 
 clearSavedButton.addEventListener("click", () => {
+  const confirmed = window.confirm(
+    "Deseja apagar os dados salvos neste navegador? O painel ficará vazio até você importar outro Excel ou JSON."
+  );
+  if (!confirmed) return;
+
   localStorage.removeItem("painelAtendimentosData");
   localStorage.removeItem("painelAtendimentosUpdatedAt");
-  sourceInfo.textContent = "Dados salvos apagados. Recarregando a base padrão...";
-  loadDefaultData().catch(error => {
-    statusBox.textContent = error.message;
-    statusBox.className = "status error";
-  });
+
+  allData = [];
+  dateFilter.value = "";
+  doctorFilter.innerHTML = '<option value="">Todos os médicos</option>';
+  specialtyFilter.innerHTML = '<option value="">Todas as especialidades</option>';
+
+  render();
+  sourceInfo.textContent = "Nenhuma base está carregada neste navegador.";
+  statusBox.textContent = "Dados salvos apagados com sucesso.";
+  statusBox.className = "status";
 });
 
 jsonFile.addEventListener("change", async () => {
