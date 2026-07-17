@@ -125,11 +125,15 @@ function findSchedule(date, doctor, specialties) {
 
   const starts = candidates.map(item => timeToMinutes(item.inicio)).filter(Number.isFinite);
   const ends = candidates.map(item => timeToMinutes(item.fim)).filter(Number.isFinite);
+  const lunchCandidate = candidates.find(item => item.almocoInicio && item.almocoFim);
+
   return {
     inicio: Math.min(...starts),
     fim: Math.max(...ends),
     inicioTexto: candidates.sort((a,b) => timeToMinutes(a.inicio) - timeToMinutes(b.inicio))[0].inicio,
-    fimTexto: candidates.sort((a,b) => timeToMinutes(b.fim) - timeToMinutes(a.fim))[0].fim
+    fimTexto: candidates.sort((a,b) => timeToMinutes(b.fim) - timeToMinutes(a.fim))[0].fim,
+    almocoInicio: lunchCandidate?.almocoInicio || null,
+    almocoFim: lunchCandidate?.almocoFim || null
   };
 }
 
@@ -182,7 +186,9 @@ function renderScheduleAnalysis(data) {
         <tr>
           <td>${formatDateBr(data)}</td>
           <td>${medico}</td>
-          <td>${schedule ? `${schedule.inicioTexto} às ${schedule.fimTexto}` : "Horário não cadastrado"}</td>
+          <td>${schedule
+            ? `${schedule.inicioTexto} às ${schedule.fimTexto}${schedule.almocoInicio ? `<br><small>Almoço: ${schedule.almocoInicio} às ${schedule.almocoFim}</small>` : ""}`
+            : "Horário não cadastrado"}</td>
           <td>${starts[0] || "—"}</td>
           <td>${schedule ? entryStatus(starts[0], schedule.inicio) : "—"}</td>
           <td>${ends.at(-1) || "—"}</td>
