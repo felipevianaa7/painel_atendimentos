@@ -56,6 +56,20 @@ function timeToText(value) {
   return match ? `${match[1]}:${match[2]}` : text;
 }
 
+
+function waitToMinutes(row) {
+  const rawMinutes = pick(row, ["Espera (min)"]);
+
+  if (rawMinutes !== undefined && rawMinutes !== null && rawMinutes !== "") {
+    const numeric = Number(rawMinutes);
+    return Number.isFinite(numeric) ? Math.round(numeric) : null;
+  }
+
+  return durationToMinutes(
+    pick(row, ["Tempo de espera", "Espera"])
+  );
+}
+
 function durationToMinutes(value) {
   if (value === null || value === undefined || value === "") return null;
 
@@ -113,7 +127,7 @@ async function convertFile(file) {
       tempoSistemaMinutos: durationToMinutes(pick(row, ["Tempo pelo sistema", "Tempo de atendimento pelo sistema"])),
       tempoRealMinutos: durationToMinutes(pick(row, ["Tempo real apurado", "Tempo de atendimento real"])),
       tempoAtendimentoMinutos: durationToMinutes(pick(row, ["Tempo em atendimento", "Tempo de atendimento"])),
-      esperaMinutos: durationToMinutes(pick(row, ["Tempo de espera", "Espera", "Espera (min)"])),
+      esperaMinutos: waitToMinutes(row),
       sobreposicao: String(pick(row, ["Sobreposição", "Sobreposicao"])).toLowerCase() === "sim",
       observacao: String(pick(row, ["Observação", "Observacao"])).trim(),
       intervaloSeguinteMinutos: durationToMinutes(pick(row, ["Intervalo seguinte", "Intervalo até o próximo atendimento"])),
