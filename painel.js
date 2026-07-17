@@ -12,6 +12,32 @@ const resultsBody = document.getElementById("resultsBody");
 let allData = [];
 
 
+
+function hasOverlap(item) {
+  const value = item?.sobreposicao;
+
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  const normalized = String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  return normalized === "sim" || normalized === "true" || normalized === "1";
+}
+
+function normalizeData(items) {
+  if (!Array.isArray(items)) return [];
+
+  return items.map(item => ({
+    ...item,
+    sobreposicao: hasOverlap(item)
+  }));
+}
+
 function consideredMinutes(item) {
   if (Number.isFinite(item.tempoConsideradoMinutos)) {
     return item.tempoConsideradoMinutos;
@@ -73,7 +99,7 @@ function render() {
   const average = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : null;
   const starts = data.map(item => item.inicio).filter(Boolean).sort();
   const ends = data.map(item => item.termino).filter(Boolean).sort();
-  const overlaps = data.filter(item => item.sobreposicao).length;
+  const overlaps = data.filter(hasOverlap).length;
 
   document.getElementById("patientCount").textContent = data.length;
   document.getElementById("averageTime").textContent = minutesText(average);
@@ -96,7 +122,7 @@ function render() {
     `Foram encontrados ${data.length} pacientes atendidos${doctorText}${periodText}.`;
 
   resultsBody.innerHTML = data.map(item => `
-    <tr class="${item.sobreposicao ? "overlap" : ""}">
+    <tr class="${hasOverlap(item) ? "overlap" : ""}">
       <td>${formatDateBr(item.data)}</td>
       <td>${item.medico}</td>
       <td>${item.especialidade}</td>
@@ -104,7 +130,7 @@ function render() {
       <td>${item.inicio}</td>
       <td>${item.termino}</td>
       <td>${minutesText(consideredMinutes(item))}</td>
-      <td><span class="badge ${item.sobreposicao ? "yes" : "no"}">${item.sobreposicao ? "Sim" : "Não"}</span></td>
+      <td><span class="badge ${hasOverlap(item) ? "yes" : "no"}">${hasOverlap(item) ? "Sim" : "Não"}</span></td>
     </tr>
   `).join("");
 
@@ -118,7 +144,7 @@ async function loadDefaultData() {
 
   if (saved) {
     try {
-      allData = JSON.parse(saved);
+      allData = normalizeData(JSON.parse(saved));
       populateFilters();
       render();
       const when = updatedAt ? new Date(updatedAt).toLocaleString("pt-BR") : "data desconhecida";
@@ -132,7 +158,7 @@ async function loadDefaultData() {
 
   const response = await fetch("dados/atendimentos.json", { cache: "no-store" });
   if (!response.ok) throw new Error("Não foi possível carregar os dados iniciais.");
-  allData = await response.json();
+  allData = normalizeData(await response.json());
   populateFilters();
   render();
   sourceInfo.textContent = "Fonte: arquivo padrão publicado com o site.";
@@ -176,7 +202,7 @@ jsonFile.addEventListener("change", async () => {
   const file = jsonFile.files[0];
   if (!file) return;
   try {
-    allData = JSON.parse(await file.text());
+    allData = normalizeData(JSON.parse(await file.text()));
     localStorage.setItem("painelAtendimentosData", JSON.stringify(allData));
     localStorage.setItem("painelAtendimentosUpdatedAt", new Date().toISOString());
     populateFilters();
