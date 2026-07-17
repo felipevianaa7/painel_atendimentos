@@ -31,3 +31,11 @@ O painel carrega sempre a base pública `dados/atendimentos.json` ao abrir a pá
 ## Tabela de atendimentos
 
 Em telas de computador, a tabela principal usa layout compacto e quebra de texto para caber na largura da página sem rolagem lateral. Em telas menores, a rolagem horizontal continua disponível para preservar a leitura.
+
+
+## Layout da análise de horários
+
+Em telas de computador, a tabela da análise de horários usa colunas compactas,
+quebra de linha e largura fixa para caber integralmente na página, sem rolagem
+horizontal. Em telas menores, a rolagem horizontal é mantida para preservar a
+legibilidade.

@@ -186,10 +186,59 @@ footer {
   .card { padding: 15px; }
 }
 
-.analysis-table { min-width: 1180px; }
+/* Análise de horários compacta em telas de computador */
+.analysis-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  font-size: .79rem;
+}
+
+.analysis-table th,
+.analysis-table td {
+  padding: 9px 6px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  vertical-align: middle;
+}
+
+.analysis-table th:nth-child(1) { width: 8%; }
+.analysis-table th:nth-child(2) { width: 14%; }
+.analysis-table th:nth-child(3) { width: 13%; }
+.analysis-table th:nth-child(4) { width: 11%; }
+.analysis-table th:nth-child(5) { width: 14%; }
+.analysis-table th:nth-child(6) { width: 10%; }
+.analysis-table th:nth-child(7) { width: 16%; }
+.analysis-table th:nth-child(8) { width: 14%; }
+
 .analysis-table td:nth-child(5),
 .analysis-table td:nth-child(7),
-.analysis-table td:nth-child(8) { font-weight: 700; }
+.analysis-table td:nth-child(8) {
+  font-weight: 700;
+}
+
+.analysis-table small {
+  display: block;
+  margin-top: 3px;
+  font-size: .72rem;
+  line-height: 1.25;
+}
+
+/* Em telas menores, preserva a leitura com rolagem horizontal */
+@media (max-width: 900px) {
+  .analysis-table {
+    min-width: 1050px;
+    table-layout: auto;
+    font-size: .82rem;
+  }
+
+  .analysis-table th,
+  .analysis-table td {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+}
 
 
 /* Tabela principal compacta, sem rolagem lateral em telas de computador */
