@@ -258,29 +258,13 @@ function render() {
 }
 
 async function loadDefaultData() {
-  const saved = localStorage.getItem("painelAtendimentosData");
-  const updatedAt = localStorage.getItem("painelAtendimentosUpdatedAt");
-
-  if (saved) {
-    try {
-      allData = normalizeData(JSON.parse(saved));
-      populateFilters();
-      render();
-      const when = updatedAt ? new Date(updatedAt).toLocaleString("pt-BR") : "data desconhecida";
-      sourceInfo.textContent = `Fonte: dados salvos neste navegador em ${when}.`;
-      return;
-    } catch {
-      localStorage.removeItem("painelAtendimentosData");
-      localStorage.removeItem("painelAtendimentosUpdatedAt");
-    }
-  }
-
   const response = await fetch("dados/atendimentos.json", { cache: "no-store" });
   if (!response.ok) throw new Error("Não foi possível carregar os dados iniciais.");
+
   allData = normalizeData(await response.json());
   populateFilters();
   render();
-  sourceInfo.textContent = "Fonte: arquivo padrão publicado com o site.";
+  sourceInfo.textContent = "Fonte: base pública atualizada publicada com o site.";
 }
 
 document.getElementById("applyButton").addEventListener("click", render);
@@ -302,7 +286,7 @@ endDateFilter.addEventListener("change", render);
 
 clearSavedButton.addEventListener("click", () => {
   const confirmed = window.confirm(
-    "Deseja apagar os dados salvos neste navegador? O painel voltará a carregar a base pública publicada no site."
+    "Deseja apagar os dados importados neste navegador? O painel recarregará a base pública atualizada."
   );
   if (!confirmed) return;
 

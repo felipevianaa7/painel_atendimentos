@@ -22,3 +22,12 @@ Data inicial, data final, especialidade e médico. A escolha da especialidade li
 ## Privacidade
 
 Os dados exibidos são anonimizados para preservar a privacidade dos pacientes, conforme a LGPD.
+
+
+## Fonte carregada ao abrir o site
+
+O painel carrega sempre a base pública `dados/atendimentos.json` ao abrir a página. Isso evita que uma versão antiga do `localStorage` esconda campos novos, como geração da senha e tempo de espera.
+
+## Tabela de atendimentos
+
+Em telas de computador, a tabela principal usa layout compacto e quebra de texto para caber na largura da página sem rolagem lateral. Em telas menores, a rolagem horizontal continua disponível para preservar a leitura.
