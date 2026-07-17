@@ -34,12 +34,12 @@
         <input id="endDateFilter" type="date">
       </div>
       <div class="field">
-        <label for="doctorFilter">Médico</label>
-        <select id="doctorFilter"><option value="">Todos os médicos</option></select>
-      </div>
-      <div class="field">
         <label for="specialtyFilter">Especialidade</label>
         <select id="specialtyFilter"><option value="">Todas as especialidades</option></select>
+      </div>
+      <div class="field">
+        <label for="doctorFilter">Médico</label>
+        <select id="doctorFilter"><option value="">Todos os médicos</option></select>
       </div>
       <div class="field full actions">
         <button id="applyButton" class="button">Consultar</button>
@@ -66,6 +66,23 @@
   </section>
 
   <section class="card">
+    <h2>Análise de horários</h2>
+    <p class="note">O início é considerado dentro do horário quando ocorre até 15 minutos após o começo previsto da agenda. O último término é comparado ao horário final informado, sem concluir automaticamente que houve saída antecipada.</p>
+    <div class="table-wrap">
+      <table class="analysis-table">
+        <thead>
+          <tr>
+            <th>Data</th><th>Médico</th><th>Agenda prevista</th><th>Primeiro atendimento</th>
+            <th>Análise da entrada</th><th>Último término</th><th>Relação com o fim</th>
+            <th>Espera acima de 1h30</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleAnalysisBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
     <h2>Atendimentos encontrados</h2>
     <div class="table-wrap">
       <table>
@@ -81,7 +98,8 @@
   </section>
 </main>
 
-<footer>Os dados exibidos são anonimizados para preservar a privacidade dos pacientes, conforme a LGPD..</footer>
+<footer>Os dados exibidos são anonimizados para preservar a privacidade dos pacientes, conforme a LGPD.</footer>
+<script src="horarios.js"></script>
 <script src="painel.js"></script>
 </body>
 </html>

@@ -185,3 +185,8 @@ footer {
   .kpis { grid-template-columns: 1fr; }
   .card { padding: 15px; }
 }
+
+.analysis-table { min-width: 1180px; }
+.analysis-table td:nth-child(5),
+.analysis-table td:nth-child(7),
+.analysis-table td:nth-child(8) { font-weight: 700; }
