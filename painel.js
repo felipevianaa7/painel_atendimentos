@@ -34,7 +34,8 @@ function normalizeData(items) {
   }));
 }
 
-function consideredMinutes(item) {
+function attendanceMinutes(item) {
+  if (Number.isFinite(item.tempoAtendimentoMinutos)) return item.tempoAtendimentoMinutos;
   if (Number.isFinite(item.tempoConsideradoMinutos)) return item.tempoConsideradoMinutos;
   return Number.isFinite(item.tempoRealMinutos) ? item.tempoRealMinutos : item.tempoSistemaMinutos;
 }
@@ -205,14 +206,17 @@ function renderScheduleAnalysis(data) {
 
 function render() {
   const data = filteredData();
-  const durations = data.map(consideredMinutes).filter(Number.isFinite);
+  const durations = data.map(attendanceMinutes).filter(Number.isFinite);
   const average = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : null;
+  const waits = data.map(item => item.esperaMinutos).filter(Number.isFinite);
+  const averageWait = waits.length ? Math.round(waits.reduce((a,b) => a+b, 0) / waits.length) : null;
   const starts = data.map(item => item.inicio).filter(Boolean).sort();
   const ends = data.map(item => item.termino).filter(Boolean).sort();
   const overlaps = data.filter(hasOverlap).length;
 
   document.getElementById("patientCount").textContent = data.length;
   document.getElementById("averageTime").textContent = minutesText(average);
+  document.getElementById("averageWait").textContent = minutesText(averageWait);
   document.getElementById("firstTime").textContent = starts[0] || "—";
   document.getElementById("lastTime").textContent = ends.at(-1) || "—";
   document.getElementById("overlapCount").textContent = overlaps;
@@ -240,9 +244,11 @@ function render() {
       <td>${item.medico}</td>
       <td>${item.especialidade}</td>
       <td>${item.paciente}</td>
+      <td>${item.geracaoSenha || "—"}</td>
       <td>${item.inicio || "—"}</td>
       <td>${item.termino || "—"}</td>
-      <td>${minutesText(consideredMinutes(item))}</td>
+      <td>${minutesText(attendanceMinutes(item))}</td>
+      <td>${minutesText(item.esperaMinutos)}</td>
       <td><span class="badge ${hasOverlap(item) ? "yes" : "no"}">${hasOverlap(item) ? "Sim" : "Não"}</span></td>
     </tr>
   `).join("");
