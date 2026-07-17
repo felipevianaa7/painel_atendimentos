@@ -258,6 +258,28 @@ function render() {
 }
 
 async function loadDefaultData() {
+  const savedData = localStorage.getItem("painelAtendimentosData");
+  const savedAt = localStorage.getItem("painelAtendimentosUpdatedAt");
+
+  if (savedData) {
+    try {
+      allData = normalizeData(JSON.parse(savedData));
+      populateFilters();
+      render();
+
+      const updatedText = savedAt
+        ? new Date(savedAt).toLocaleString("pt-BR")
+        : "data não informada";
+
+      sourceInfo.textContent =
+        `Fonte: dados importados e salvos neste navegador em ${updatedText}.`;
+      return;
+    } catch (error) {
+      localStorage.removeItem("painelAtendimentosData");
+      localStorage.removeItem("painelAtendimentosUpdatedAt");
+    }
+  }
+
   const response = await fetch("dados/atendimentos.json", { cache: "no-store" });
   if (!response.ok) throw new Error("Não foi possível carregar os dados iniciais.");
 

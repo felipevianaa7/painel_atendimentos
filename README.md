@@ -39,3 +39,13 @@ Em telas de computador, a tabela da análise de horários usa colunas compactas,
 quebra de linha e largura fixa para caber integralmente na página, sem rolagem
 horizontal. Em telas menores, a rolagem horizontal é mantida para preservar a
 legibilidade.
+
+
+## Prioridade da fonte de dados
+
+Ao abrir o painel:
+
+1. se houver dados convertidos e salvos neste navegador, eles são utilizados;
+2. caso contrário, o painel carrega `dados/atendimentos.json`.
+
+O botão **Apagar dados salvos** remove a importação local e volta para a base pública.
