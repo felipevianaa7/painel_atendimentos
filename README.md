@@ -60,3 +60,8 @@ do formato de duração do Excel.
 ## Geração e confirmação da senha
 
 O conversor lê as colunas `Geração da senha` e `Confirmação da senha` da Base Consolidada e grava os campos `geracaoSenha` e `confirmacaoSenha` no JSON.
+
+
+## Regra atual do tempo de espera
+
+O tempo de espera é calculado pelo início do atendimento menos a confirmação da senha. Na ausência da confirmação, utiliza-se a geração da senha.
