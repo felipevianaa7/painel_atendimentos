@@ -1,5 +1,6 @@
 
-const dateFilter = document.getElementById("dateFilter");
+const startDateFilter = document.getElementById("startDateFilter");
+const endDateFilter = document.getElementById("endDateFilter");
 const doctorFilter = document.getElementById("doctorFilter");
 const specialtyFilter = document.getElementById("specialtyFilter");
 const jsonFile = document.getElementById("jsonFile");
@@ -51,12 +52,16 @@ function populateFilters() {
   specialtyFilter.value = selectedSpecialty;
 
   const dates = uniqueSorted("data");
-  if (!dateFilter.value && dates.length) dateFilter.value = dates[dates.length - 1];
+  if (dates.length) {
+    if (!startDateFilter.value) startDateFilter.value = dates[0];
+    if (!endDateFilter.value) endDateFilter.value = dates[dates.length - 1];
+  }
 }
 
 function filteredData() {
   return allData.filter(item =>
-    (!dateFilter.value || item.data === dateFilter.value) &&
+    (!startDateFilter.value || item.data >= startDateFilter.value) &&
+    (!endDateFilter.value || item.data <= endDateFilter.value) &&
     (!doctorFilter.value || item.medico === doctorFilter.value) &&
     (!specialtyFilter.value || item.especialidade === specialtyFilter.value)
   );
@@ -77,9 +82,18 @@ function render() {
   document.getElementById("overlapCount").textContent = overlaps;
 
   const doctorText = doctorFilter.value ? ` pelo médico ${doctorFilter.value}` : "";
-  const dateText = dateFilter.value ? ` em ${formatDateBr(dateFilter.value)}` : "";
+  let periodText = "";
+  if (startDateFilter.value && endDateFilter.value) {
+    periodText = startDateFilter.value === endDateFilter.value
+      ? ` em ${formatDateBr(startDateFilter.value)}`
+      : ` entre ${formatDateBr(startDateFilter.value)} e ${formatDateBr(endDateFilter.value)}`;
+  } else if (startDateFilter.value) {
+    periodText = ` a partir de ${formatDateBr(startDateFilter.value)}`;
+  } else if (endDateFilter.value) {
+    periodText = ` até ${formatDateBr(endDateFilter.value)}`;
+  }
   document.getElementById("answerText").textContent =
-    `Foram encontrados ${data.length} pacientes atendidos${doctorText}${dateText}.`;
+    `Foram encontrados ${data.length} pacientes atendidos${doctorText}${periodText}.`;
 
   resultsBody.innerHTML = data.map(item => `
     <tr class="${item.sobreposicao ? "overlap" : ""}">
@@ -126,14 +140,16 @@ async function loadDefaultData() {
 
 document.getElementById("applyButton").addEventListener("click", render);
 document.getElementById("clearButton").addEventListener("click", () => {
-  dateFilter.value = "";
+  startDateFilter.value = "";
+  endDateFilter.value = "";
   doctorFilter.value = "";
   specialtyFilter.value = "";
   render();
 });
 doctorFilter.addEventListener("change", render);
 specialtyFilter.addEventListener("change", render);
-dateFilter.addEventListener("change", render);
+startDateFilter.addEventListener("change", render);
+endDateFilter.addEventListener("change", render);
 
 clearSavedButton.addEventListener("click", () => {
   const confirmed = window.confirm(
@@ -145,7 +161,8 @@ clearSavedButton.addEventListener("click", () => {
   localStorage.removeItem("painelAtendimentosUpdatedAt");
 
   allData = [];
-  dateFilter.value = "";
+  startDateFilter.value = "";
+  endDateFilter.value = "";
   doctorFilter.innerHTML = '<option value="">Todos os médicos</option>';
   specialtyFilter.innerHTML = '<option value="">Todas as especialidades</option>';
 
