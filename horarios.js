@@ -26,6 +26,24 @@ const HORARIOS_MEDICOS = [
 
 const AGENDAS_EXTRAS = [
 
+  {
+    medico: "Fernanda Ferreira da Silva Vila Nova",
+    aliases: ["Fernanda Ferreira D"],
+    especialidade: "Ginecologia Clínica",
+    data: "2026-07-10",
+    inicio: "08:00",
+    fim: "16:00"
+  },
+  {
+    medico: "Fernanda Ferreira da Silva Vila Nova",
+    aliases: ["Fernanda Ferreira D"],
+    especialidade: "Obstetrícia / Pré-Natal",
+    data: "2026-07-10",
+    inicio: "16:00",
+    fim: "18:00"
+  },
+
+
   { medico: "Bruno Garrett Bento", aliases: [], especialidade: "Neurocirurgia", data: "2026-07-13", inicio: "08:00", fim: "17:00", almocoInicio: "12:00", almocoFim: "13:00" },
   { medico: "Diana Guimarães de Sales Matheus", aliases: [], especialidade: "Geriatria", data: "2026-07-30", inicio: "08:00", fim: "17:00" },
   { medico: "Fernanda Ferreira da Silva Vila Nova", aliases: ["Fernanda Ferreira D"], especialidade: "Ginecologia Clínica", data: "2026-07-07", inicio: "12:00", fim: "16:00" },

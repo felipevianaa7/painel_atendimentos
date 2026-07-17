@@ -1,43 +1,50 @@
-# Painel de Atendimentos
+PAINEL DE ATENDIMENTOS
 
-Projeto estático com duas páginas:
+Projeto para análise dos relatórios de atendimento da tela T9095A.
 
-- `index.html`: consulta dos dados do arquivo JSON.
-- `converter.html`: converte a aba **Base Consolidada** de um Excel em `atendimentos.json`.
+ARQUIVOS PRINCIPAIS
+- index.html: painel de consulta.
+- painel.js: filtros, indicadores e análises.
+- horarios.js: agendas regulares, agendas extras e horários de almoço.
+- converter.html / converter.js: conversão da planilha para JSON.
+- dados/atendimentos.json: base pública exibida pelo site.
+- dados/Analise_Atendimentos_Julho_2026.xlsx: planilha mensal disponível para download.
 
-## Atualização dos dados
+FILTROS
+- Data inicial.
+- Data final.
+- Especialidade.
+- Médico.
 
-1. Abra `converter.html` no site publicado.
-2. Selecione o Excel criado com a aba **Base Consolidada**.
-3. Clique em **Converter para JSON**.
-4. Baixe o arquivo `atendimentos.json`.
-5. Substitua `dados/atendimentos.json` no repositório do GitHub.
-6. Faça o commit. O Vercel publicará a atualização automaticamente.
+Ao selecionar uma especialidade, o campo Médico exibe somente os profissionais
+que possuem registros naquela especialidade.
 
-## Testar no computador
+ANÁLISE DE HORÁRIOS
+A análise compara:
+- primeiro atendimento com o início previsto, usando tolerância de 15 minutos;
+- último término com o fim previsto;
+- quantidade de esperas superiores a 1h30.
 
-Por segurança do navegador, o `fetch` do JSON pode não funcionar ao abrir o HTML diretamente.
-Na pasta do projeto, execute um servidor local, por exemplo:
+Quando um médico atende duas especialidades no mesmo dia, a análise diária reúne
+os blocos de agenda daquele dia.
 
-```bash
-python -m http.server 8000
-```
+DRA. FERNANDA
+- 10/07/2026:
+  Ginecologia Clínica, 08:00 às 16:00.
+  Obstetrícia / Pré-Natal, 16:00 às 18:00.
+  Período diário analisado: 08:00 às 18:00.
+- 16/07/2026:
+  Obstetrícia / Pré-Natal, 08:00 às 12:00.
+  Ginecologia Clínica, 12:00 às 16:00.
+  Período diário analisado: 08:00 às 16:00.
 
-Depois abra `http://localhost:8000`.
+ATUALIZAÇÃO DOS DADOS
+Para que todos os dispositivos vejam a mesma informação:
+1. Atualize a planilha mensal.
+2. Gere o arquivo dados/atendimentos.json.
+3. Substitua os dois arquivos no GitHub.
+4. Aguarde a nova publicação do Vercel.
 
-## Publicar no Vercel
-
-Suba esta pasta para um repositório no GitHub e importe o repositório no Vercel.
-Como é um site estático, não precisa de banco de dados nem configuração de build.
-
-
-## Novo fluxo pelo Vercel
-
-1. Abra o site publicado no Vercel.
-2. Entre em **Converter Excel**.
-3. Selecione o Excel com a aba **Base Consolidada**.
-4. Clique em **Converter para JSON**.
-5. Clique em **Usar estes dados no painel**.
-6. O navegador salva os dados localmente e abre a página de consulta.
-
-Os dados ficam disponíveis somente naquele navegador e computador. Para usar em outro dispositivo, basta repetir a conversão ou carregar um JSON.
+PRIVACIDADE
+Os dados exibidos são anonimizados para preservar a privacidade dos pacientes,
+conforme a LGPD.
