@@ -122,6 +122,8 @@ async function convertFile(file) {
       medico: String(pick(row, ["Médico", "Medico"])).trim(),
       especialidade: String(pick(row, ["Especialidade"])).trim(),
       paciente: String(pick(row, ["Nome fila", "Paciente"])).trim(),
+      geracaoSenha: timeToText(pick(row, ["Geração da senha", "Geracao da senha", "Ger. Senha", "Ger. senha"])),
+      confirmacaoSenha: timeToText(pick(row, ["Confirmação da senha", "Confirmacao da senha", "Conf. Senha", "Conf. senha"])),
       inicio: timeToText(pick(row, ["Início", "Inicio"])),
       termino: timeToText(pick(row, ["Término", "Termino"])),
       tempoSistemaMinutos: durationToMinutes(pick(row, ["Tempo pelo sistema", "Tempo de atendimento pelo sistema"])),
@@ -145,6 +147,7 @@ function renderPreview(data) {
       <td>${item.medico}</td>
       <td>${item.especialidade}</td>
       <td>${item.paciente}</td>
+      <td>${item.geracaoSenha || "—"}</td>
       <td>${item.inicio}</td>
       <td>${item.termino}</td>
     </tr>

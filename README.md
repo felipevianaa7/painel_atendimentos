@@ -56,3 +56,7 @@ O botão **Apagar dados salvos** remove a importação local e volta para a base
 A coluna `Espera (min)` já contém minutos inteiros e é lida diretamente.
 Colunas de duração como `Tempo de espera` continuam sendo convertidas a partir
 do formato de duração do Excel.
+
+## Geração e confirmação da senha
+
+O conversor lê as colunas `Geração da senha` e `Confirmação da senha` da Base Consolidada e grava os campos `geracaoSenha` e `confirmacaoSenha` no JSON.
