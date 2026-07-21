@@ -191,44 +191,43 @@ footer {
   width: 100%;
   min-width: 0;
   table-layout: fixed;
-  font-size: .79rem;
+  font-size: .73rem;
 }
 
 .analysis-table th,
 .analysis-table td {
-  padding: 9px 6px;
+  padding: 7px 4px;
   white-space: normal;
   overflow-wrap: anywhere;
-  line-height: 1.35;
+  line-height: 1.25;
   vertical-align: middle;
 }
 
-.analysis-table th:nth-child(1) { width: 8%; }
-.analysis-table th:nth-child(2) { width: 14%; }
-.analysis-table th:nth-child(3) { width: 13%; }
-.analysis-table th:nth-child(4) { width: 11%; }
-.analysis-table th:nth-child(5) { width: 14%; }
-.analysis-table th:nth-child(6) { width: 10%; }
-.analysis-table th:nth-child(7) { width: 16%; }
-.analysis-table th:nth-child(8) { width: 14%; }
+.analysis-table th:nth-child(1) { width: 7%; }
+.analysis-table th:nth-child(2) { width: 12%; }
+.analysis-table th:nth-child(3) { width: 6%; }
+.analysis-table th:nth-child(4) { width: 12%; }
+.analysis-table th:nth-child(5) { width: 10%; }
+.analysis-table th:nth-child(6) { width: 13%; }
+.analysis-table th:nth-child(7) { width: 9%; }
+.analysis-table th:nth-child(8) { width: 18%; }
+.analysis-table th:nth-child(9) { width: 13%; }
 
-.analysis-table td:nth-child(5),
-.analysis-table td:nth-child(7),
-.analysis-table td:nth-child(8) {
-  font-weight: 700;
-}
+.analysis-table td:nth-child(3),
+.analysis-table td:nth-child(6),
+.analysis-table td:nth-child(8),
+.analysis-table td:nth-child(9) { font-weight: 700; }
 
 .analysis-table small {
   display: block;
-  margin-top: 3px;
-  font-size: .72rem;
-  line-height: 1.25;
+  margin-top: 2px;
+  font-size: .66rem;
+  line-height: 1.2;
 }
 
-/* Em telas menores, preserva a leitura com rolagem horizontal */
 @media (max-width: 900px) {
   .analysis-table {
-    min-width: 1050px;
+    min-width: 1120px;
     table-layout: auto;
     font-size: .82rem;
   }
@@ -269,7 +268,7 @@ footer {
 @media (max-width: 900px) {
   .table-wrap { overflow-x: auto; }
   .appointments-table {
-    min-width: 1050px;
+    min-width: 1120px;
     table-layout: auto;
   }
   .appointments-table th,

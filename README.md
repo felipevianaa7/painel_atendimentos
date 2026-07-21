@@ -65,3 +65,10 @@ O conversor lê as colunas `Geração da senha` e `Confirmação da senha` da Ba
 ## Regra atual do tempo de espera
 
 O tempo de espera é calculado pelo início do atendimento menos a confirmação da senha. Na ausência da confirmação, utiliza-se a geração da senha.
+
+
+## Atualização André – 07 e 09/07
+
+- Incluídos 18 atendimentos de 07/07 e 23 atendimentos de 09/07.
+- Base pública total: 837 registros.
+- A análise de horários passou a exibir a quantidade de pacientes por médico e data.

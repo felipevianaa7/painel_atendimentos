@@ -187,6 +187,7 @@ function renderScheduleAnalysis(data) {
         <tr>
           <td>${formatDateBr(data)}</td>
           <td>${medico}</td>
+          <td>${items.length}</td>
           <td>${schedule
             ? `${schedule.inicioTexto} às ${schedule.fimTexto}${schedule.almocoInicio ? `<br><small>Almoço: ${schedule.almocoInicio} às ${schedule.almocoFim}</small>` : ""}`
             : "Horário não cadastrado"}</td>
@@ -201,7 +202,7 @@ function renderScheduleAnalysis(data) {
 
   scheduleAnalysisBody.innerHTML = rows.length
     ? rows.join("")
-    : '<tr><td colspan="8">Nenhum atendimento encontrado para o período selecionado.</td></tr>';
+    : '<tr><td colspan="9">Nenhum atendimento encontrado para o período selecionado.</td></tr>';
 }
 
 function render() {
